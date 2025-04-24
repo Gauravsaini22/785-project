@@ -54,6 +54,14 @@ self.addEventListener('install', event => {
     })
   );
 });
+self.addEventListener("install", (event) => {
+  event.waitUntil(
+  caches.open(CACHE_NAME).then((cache) => {
+  console.log("Caching assets");
+  return cache.addAll(urlsToCache);
+  })
+  );
+  });
 
 self.addEventListener('fetch', event => {
   event.respondWith(
@@ -62,3 +70,17 @@ self.addEventListener('fetch', event => {
     })
   );
 });
+self.addEventListener("activate", (event) => {
+  event.waitUntil(
+  caches.keys().then((cacheNames) => {
+  return Promise.all(
+  cacheNames.map((cache) => {
+  if (cache !== CACHE_NAME) {
+  console.log("Deleting old cache:", cache);
+  return caches.delete(cache);
+  }
+  })
+  );
+  })
+  );
+  });
